@@ -28,7 +28,7 @@ RESUMES_CLEAN_CSV = PROCESSED_DIR / "resumes_clean.csv"  # cleaned resumes
 JOBS_CLEAN_CSV = PROCESSED_DIR / "jobs_clean.csv"        # model-ready jobs (+ text col)
 
 # ---- Common schema every job source is mapped to before merging ----
-COMMON_JOB_COLUMNS = ["title", "company", "location", "skills", "description", "experience"]
+COMMON_JOB_COLUMNS = ["title", "company", "location", "skills", "description", "experience", "category"]
 
 # ---- Constants ----
 RANDOM_STATE = 42   # seed for reproducible train/test splits

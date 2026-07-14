@@ -26,7 +26,7 @@ def load_resumes():
 def load_naukri():
     """Naukri jobs -> only the columns we map to the common schema."""
     cols = ["jobtitle", "company", "joblocation_address",
-            "skills", "jobdescription", "experience"]
+            "skills", "jobdescription", "experience", "industry"]
     return _read_csv(config.NAUKRI_CSV, usecols=cols)
 
 
