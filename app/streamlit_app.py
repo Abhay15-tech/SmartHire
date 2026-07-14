@@ -265,7 +265,6 @@ CAT_ICONS = {
     "ETL Developer":"🔄","DevOps Engineer":"🛠️","PMO":"📋",
 }
 
-@st.cache_resource
 def load_models():
     clf_model, clf_vec = load_clf(config.MODELS_DIR / "resume_classifier.pkl")
     recommender = JobRecommender.load(config.MODELS_DIR / "job_recommender.pkl")
