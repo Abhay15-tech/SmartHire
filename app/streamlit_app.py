@@ -7,6 +7,7 @@ import time
 from src.parsing.resume_parser import parse_resume
 from src.models.classifier import load_model as load_clf, predict_category
 from src.models.recommender import JobRecommender
+from src.models.skill_gap import get_skill_gap_report
 from src import config
 
 st.set_page_config(
@@ -424,6 +425,9 @@ def main():
     left, right = st.columns([4, 6], gap="large")
 
     with left:
+        # Match cluster/role family
+        matched_cluster = top_jobs[0].get("cluster_label", "Not specified") if top_jobs else "Not specified"
+
         # Category
         icon = CAT_ICONS.get(category, "💡")
         st.markdown(f"""
@@ -432,6 +436,7 @@ def main():
   <div>
     <div class="cat-lbl">AI Predicted Role</div>
     <div class="cat-name">{category}</div>
+    <div style="font-size:0.8rem; color:#60a5fa; margin-top:0.25rem;">Role Family: {matched_cluster}</div>
     <span class="cat-pill">✨ Best Match</span>
   </div>
 </div>""", unsafe_allow_html=True)
@@ -448,6 +453,38 @@ def main():
   </div>
   <div class="itip">💡 Best ATS results: 400–800 words with keyword-rich content.</div>
 </div>""", unsafe_allow_html=True)
+
+        # Skill Gap Report
+        try:
+            skills_report = get_skill_gap_report(
+                resume_text, category, recommender.job_corpus, role_col="category"
+            )
+            
+            gap_badges = ""
+            possess_badges = ""
+            for item in skills_report:
+                skill = item["skill"]
+                pct = item["importance"]
+                if item["present"]:
+                    possess_badges += f'<span class="skill-chip" style="background:rgba(16,185,129,.07); border-color:rgba(16,185,129,.25); color:#34d399">✓ {skill}</span>'
+                else:
+                    gap_badges += f'<span class="skill-chip" style="background:rgba(139,92,246,.07); border-color:rgba(139,92,246,.25); color:#a78bfa">⚡ {skill} ({pct}% demand)</span>'
+            
+            st.markdown(f"""
+<div class="gcard fu3">
+  <div class="sh"><span class="ico">🎯</span><h3>Skills to Improve</h3></div>
+  <div style="margin-bottom:0.7rem">
+    <div style="font-size:0.75rem; color:#a78bfa; margin-bottom:0.35rem; text-transform:uppercase; letter-spacing:1px">Missing Skills (Target Gaps)</div>
+    {gap_badges if gap_badges else '<div style="font-size:0.8rem; color:#64748b">No gaps identified!</div>'}
+  </div>
+  <div>
+    <div style="font-size:0.75rem; color:#34d399; margin-bottom:0.35rem; text-transform:uppercase; letter-spacing:1px">Strengths (Already Present)</div>
+    {possess_badges if possess_badges else '<div style="font-size:0.8rem; color:#64748b">None identified.</div>'}
+  </div>
+  <div class="itip purple">💡 Boost your match score by adding missing skills back to your profile or projects list!</div>
+</div>""", unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"Error computing skills gap: {e}")
 
     with right:
         st.markdown(f"""
