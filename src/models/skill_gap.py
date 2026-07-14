@@ -46,7 +46,10 @@ def get_skill_gap_report(resume_text, target_role, jobs_df, role_col="category",
     candidate_skills = extract_skills_from_text(resume_text)
 
     # 2. Filter jobs for the target role/category/cluster
-    role_jobs = jobs_df[jobs_df[role_col].astype(str).str.lower() == str(target_role).lower()]
+    if role_col not in jobs_df.columns:
+        role_jobs = jobs_df
+    else:
+        role_jobs = jobs_df[jobs_df[role_col].astype(str).str.lower() == str(target_role).lower()]
     
     if len(role_jobs) == 0:
         # Fallback to all jobs if no role-specific jobs found
